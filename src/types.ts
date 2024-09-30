@@ -51,11 +51,15 @@ export interface MapProps {
     zoom,
     bounds,
     initial,
+    width,
+    height
   }: {
     center: [number, number]
     bounds: Bounds
     zoom: number
     initial: boolean
+    width: number
+    height: number
   }) => void
   onAnimationStart?: () => void
   onAnimationStop?: () => void

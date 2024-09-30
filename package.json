@@ -30,7 +30,6 @@
     "README.md",
     "providers"
   ],
-  "dependencies": {},
   "peerDependencies": {
     "react": "*"
   },

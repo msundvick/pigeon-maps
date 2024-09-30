@@ -23,7 +23,7 @@ const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
-const DEBOUNCE_DELAY = 60
+const DEBOUNCE_DELAY = 5
 const PINCH_RELEASE_THROW_DELAY = 300
 const WARNING_DISPLAY_TIMEOUT = 300
 
@@ -938,7 +938,7 @@ export class Map extends Component<MapProps, MapReactState> {
     if (onBoundsChanged) {
       const bounds = this.getBounds(center, zoom)
 
-      onBoundsChanged({ center, zoom, bounds, initial: !this._boundsSynced })
+      onBoundsChanged({ center, zoom, bounds, initial: !this._boundsSynced, width: this.state.width, height: this.state.height })
 
       this._boundsSynced = true
     }
@@ -1398,6 +1398,8 @@ export class Map extends Component<MapProps, MapReactState> {
     }
 
     const hasSize = !!(width && height)
+    
+    this.syncToProps()
 
     return (
       <div style={containerStyle} ref={this.setRef} dir="ltr">
