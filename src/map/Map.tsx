@@ -23,7 +23,7 @@ const SCROLL_PIXELS_FOR_ZOOM_LEVEL = 150
 const MIN_DRAG_FOR_THROW = 40
 const CLICK_TOLERANCE = 2
 const DOUBLE_CLICK_DELAY = 300
-const DEBOUNCE_DELAY = 5
+const DEBOUNCE_DELAY = 60
 const PINCH_RELEASE_THROW_DELAY = 300
 const WARNING_DISPLAY_TIMEOUT = 300
 
@@ -1399,7 +1399,7 @@ export class Map extends Component<MapProps, MapReactState> {
 
     const hasSize = !!(width && height)
     
-    this.syncToProps()
+    // this.syncToProps()
 
     return (
       <div style={containerStyle} ref={this.setRef} dir="ltr">
