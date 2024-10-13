@@ -938,7 +938,14 @@ export class Map extends Component<MapProps, MapReactState> {
     if (onBoundsChanged) {
       const bounds = this.getBounds(center, zoom)
 
-      onBoundsChanged({ center, zoom, bounds, initial: !this._boundsSynced, width: this.state.width, height: this.state.height })
+      onBoundsChanged({
+        center,
+        zoom,
+        bounds,
+        initial: !this._boundsSynced,
+        width: this.state.width,
+        height: this.state.height,
+      })
 
       this._boundsSynced = true
     }
@@ -1398,7 +1405,7 @@ export class Map extends Component<MapProps, MapReactState> {
     }
 
     const hasSize = !!(width && height)
-    
+
     // this.syncToProps()
 
     return (
