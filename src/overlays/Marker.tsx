@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
-import { PigeonProps } from '../types'
+import { PigeonProps, Point } from '../types'
 
 interface MarkerProps extends PigeonProps {
   color?: string
-  payload?: any
+  payload?: unknown
 
   width?: number
   height?: number
@@ -16,10 +16,10 @@ interface MarkerProps extends PigeonProps {
   children?: JSX.Element
 
   // callbacks
-  onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onContextMenu?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOver?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
+  onClick?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onContextMenu?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onMouseOver?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onMouseOut?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
 }
 
 export function Marker(props: MarkerProps): JSX.Element {
@@ -50,15 +50,15 @@ export function Marker(props: MarkerProps): JSX.Element {
     <div
       style={{
         position: 'absolute',
-        transform: `translate(${props.left - width / 2}px, ${props.top - (height - 1)}px)`,
+        transform: `translate(${(props.left || 0) - width / 2}px, ${(props.top || 0) - (height - 1)}px)`,
         filter: hover ? 'drop-shadow(0 0 4px rgba(0, 0, 0, .3))' : '',
         pointerEvents: 'none',
         cursor: 'pointer',
         ...(props.style || {}),
       }}
       className={props.className ? `${props.className} pigeon-click-block` : 'pigeon-click-block'}
-      onClick={props.onClick ? (event) => props.onClick(eventParameters(event)) : null}
-      onContextMenu={props.onContextMenu ? (event) => props.onContextMenu(eventParameters(event)) : null}
+      onClick={props.onClick ? (event) => props.onClick?.(eventParameters(event)) : undefined}
+      onContextMenu={props.onContextMenu ? (event) => props.onContextMenu?.(eventParameters(event)) : undefined}
       onMouseOver={(event) => {
         props.onMouseOver && props.onMouseOver(eventParameters(event))
         setInternalHover(true)

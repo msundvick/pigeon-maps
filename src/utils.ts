@@ -8,7 +8,7 @@ export function debounce<T extends (...args: any[]) => any>(func: T, wait: numbe
   }
 }
 
-export function parentHasClass(element: HTMLElement, className: string) {
+export function parentHasClass(element: HTMLElement | null, className: string) {
   while (element) {
     if (element.classList && element.classList.contains(className)) {
       return true

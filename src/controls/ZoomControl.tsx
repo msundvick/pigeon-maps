@@ -36,7 +36,7 @@ export function ZoomControl({ style, buttonStyle, setCenterZoom, mapState, mapPr
         className="pigeon-zoom-in"
         type="button"
         style={buttonStyle ? { ...commonButtonStyle, ...buttonStyle } : commonButtonStyle}
-        onClick={() => setCenterZoom(mapState.center, Math.min(mapState.zoom + 1, mapProps.maxZoom))}
+        onClick={() => setCenterZoom?.(mapState?.center, Math.min((mapState?.zoom || 0) + 1, mapProps?.maxZoom || 0))}
       >
         +
       </button>
@@ -44,7 +44,7 @@ export function ZoomControl({ style, buttonStyle, setCenterZoom, mapState, mapPr
         className="pigeon-zoom-out"
         type="button"
         style={buttonStyle ? { ...commonButtonStyle, ...buttonStyle } : commonButtonStyle}
-        onClick={() => setCenterZoom(mapState.center, Math.max(mapState.zoom - 1, mapProps.minZoom))}
+        onClick={() => setCenterZoom?.(mapState?.center, Math.max((mapState?.zoom || 0) - 1, mapProps?.minZoom || 0))}
       >
         –
       </button>

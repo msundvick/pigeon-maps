@@ -12,10 +12,10 @@ interface GeoJsonProps extends PigeonProps {
   children?: React.ReactNode
 
   // callbacks
-  onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onContextMenu?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOver?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
-  onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }) => void
+  onClick?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onContextMenu?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onMouseOver?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
+  onMouseOut?: (props: { event: React.MouseEvent<Element, MouseEvent>; anchor?: Point; payload: unknown }) => void
 }
 
 interface GeoJsonLoaderProps extends GeoJsonProps {
@@ -48,20 +48,28 @@ const defaultSvgAttributes = { fill: '#93c0d099', strokeWidth: '2', stroke: 'whi
 export function PointComponent(props: GeometryProps): JSX.Element {
   const { latLngToPixel } = props
   const [y, x] = props.coordinates as [number, number]
-  const [cx, cy] = latLngToPixel([x, y])
-  if (props.svgAttributes?.path) {
-    const path = `M${cx},${cy}c${props.svgAttributes.path.split(/[c|C|L|l|v|V|h|H](.*)/s)[1]}`
-    return <path d={path} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
+  if (latLngToPixel) {
+    const [cx, cy] = latLngToPixel([x, y])
+    if (props.svgAttributes?.path) {
+      const path = `M${cx},${cy}c${props.svgAttributes.path.split(/[c|C|L|l|v|V|h|H](.*)/s)[1]}`
+      return <path d={path} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
+    }
+    return <circle cx={cx} cy={cy} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
+  } else {
+    return <></>
   }
-  return <circle cx={cx} cy={cy} {...(props.svgAttributes as SVGProps<SVGCircleElement>)} />
 }
 
 export function MultiPoint(props: GeometryProps): JSX.Element {
   return (
     <>
-      {props.coordinates.map((point, i) => (
-        <PointComponent {...props} coordinates={point} key={i} />
-      ))}
+      {props.coordinates?.map((point, i) => {
+        if (typeof point == 'number') {
+          return <></>
+        } else {
+          return <PointComponent {...props} coordinates={point} key={i} />
+        }
+      })}
     </>
   )
 }
@@ -71,7 +79,7 @@ export function LineString(props: GeometryProps): JSX.Element {
   const p =
     'M' +
     (props.coordinates as Array<[number, number]>).reduce((a, [y, x]) => {
-      const [v, w] = latLngToPixel([x, y])
+      const [v, w] = latLngToPixel?.([x, y]) || [0, 0]
       return a + ' ' + v + ' ' + w
     }, '')
 
@@ -81,9 +89,13 @@ export function LineString(props: GeometryProps): JSX.Element {
 export function MultiLineString(props: GeometryProps): JSX.Element {
   return (
     <>
-      {props.coordinates.map((line, i) => (
-        <LineString {...props} coordinates={line} key={i} />
-      ))}
+      {props.coordinates?.map((line, i) => {
+        if (typeof line == 'number') {
+          return <></>
+        } else {
+          return <LineString {...props} coordinates={line} key={i} />
+        }
+      })}
     </>
   )
 }
@@ -96,7 +108,7 @@ export function Polygon(props: GeometryProps): JSX.Element {
       a +
       ' M' +
       part.reduce((a, [y, x]) => {
-        const [v, w] = latLngToPixel([x, y])
+        const [v, w] = latLngToPixel?.([x, y]) || [0, 0]
         return a + ' ' + v + ' ' + w
       }, '') +
       'Z',
@@ -108,14 +120,18 @@ export function Polygon(props: GeometryProps): JSX.Element {
 export function MultiPolygon(props: GeometryProps): JSX.Element {
   return (
     <>
-      {props.coordinates.map((polygon, i) => (
-        <Polygon {...props} coordinates={polygon} key={i} />
-      ))}
+      {props.coordinates?.map((polygon, i) => {
+        if (typeof polygon == 'number') {
+          return <></>
+        } else {
+          return <Polygon {...props} coordinates={polygon} key={i} />
+        }
+      })}
     </>
   )
 }
 
-export function GeometryCollection(props: GeometryProps): JSX.Element {
+export function GeometryCollection(props: GeometryProps) {
   const renderer = {
     Point: PointComponent,
     MultiPoint,
@@ -125,19 +141,19 @@ export function GeometryCollection(props: GeometryProps): JSX.Element {
     MultiPolygon,
   }
 
-  const { type, coordinates, geometries } = props.geometry
+  const { type, coordinates, geometries } = props.geometry || {}
 
   if (type === 'GeometryCollection') {
     return (
       <>
-        {geometries.map((geometry, i) => (
+        {geometries?.map((geometry, i) => (
           <GeometryCollection key={i} {...props} geometry={geometry} />
         ))}
       </>
     )
   }
 
-  const Component = renderer[type]
+  const Component = renderer[type as keyof typeof renderer]
 
   if (Component === undefined) {
     console.warn(`The GeoJson Type ${type} is not known`)
@@ -175,8 +191,8 @@ export function GeoJsonFeature(props: GeoJsonProps): JSX.Element {
     <g
       clipRule="evenodd"
       style={{ pointerEvents: 'auto' }}
-      onClick={props.onClick ? (event) => props.onClick(eventParameters(event)) : null}
-      onContextMenu={props.onContextMenu ? (event) => props.onContextMenu(eventParameters(event)) : null}
+      onClick={props.onClick ? (event) => props.onClick?.(eventParameters(event)) : undefined}
+      onContextMenu={props.onContextMenu ? (event) => props.onContextMenu?.(eventParameters(event)) : undefined}
       onMouseOver={(event) => {
         props.onMouseOver && props.onMouseOver(eventParameters(event))
         setInternalHover(true)
@@ -192,7 +208,7 @@ export function GeoJsonFeature(props: GeoJsonProps): JSX.Element {
 }
 
 export function GeoJson(props: GeoJsonProps): JSX.Element {
-  const { width, height } = props.mapState
+  const { width, height } = props.mapState || {}
 
   return (
     <div
@@ -213,7 +229,10 @@ export function GeoJson(props: GeoJsonProps): JSX.Element {
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {props.data && props.data.features.map((feature, i) => <GeoJsonFeature key={i} {...props} feature={feature} />)}
+        {props.data &&
+          props.data.features.map((feature: unknown, i: React.Key | null | undefined) => (
+            <GeoJsonFeature key={i} {...props} feature={feature} />
+          ))}
 
         {React.Children.map(props.children, (child) => {
           if (!child) {
@@ -231,11 +250,11 @@ export function GeoJson(props: GeoJsonProps): JSX.Element {
   )
 }
 
-export function GeoJsonLoader(props: GeoJsonLoaderProps): JSX.Element {
+export function GeoJsonLoader(props: GeoJsonLoaderProps) {
   const [data, setData] = useState(props.data ? props.data : null)
 
   useEffect(() => {
-    fetch(props.link)
+    fetch(props.link || '')
       .then((response) => response.json())
       .then((data) => setData(data))
   }, [props.link])

@@ -52,7 +52,7 @@ export interface MapProps {
     bounds,
     initial,
     width,
-    height
+    height,
   }: {
     center: [number, number]
     bounds: Bounds
@@ -150,5 +150,10 @@ export interface PigeonProps {
   // pigeon functions
   latLngToPixel?: (latLng: Point, center?: Point, zoom?: number) => Point
   pixelToLatLng?: (pixel: Point, center?: Point, zoom?: number) => Point
-  setCenterZoom?: (center: Point | null, zoom: number, zoomAround?: Point | null, animationDuration?: number) => void
+  setCenterZoom?: (
+    center: Point | null | undefined,
+    zoom: number,
+    zoomAround?: Point | null,
+    animationDuration?: number
+  ) => void
 }

@@ -7,6 +7,7 @@ import {
   MapReactState,
   MinMaxBounds,
   MoveEvent,
+  PigeonProps,
   Point,
   Tile,
   TileComponent,
@@ -83,7 +84,7 @@ const cancelAnimationFrame = (animFrame: number | null) =>
   hasWindow && animFrame ? (window.cancelAnimationFrame || window.clearTimeout)(animFrame) : false
 
 function srcSet(
-  dprs: number[],
+  dprs: number[] | undefined,
   url: (x: number, y: number, z: number, dpr?: number) => string,
   x: number,
   y: number,
@@ -165,7 +166,7 @@ export class Map extends Component<MapProps, MapReactState> {
   _lastCenter: Point
   _centerStart?: Point
 
-  _resizeObserver = null
+  _resizeObserver: ResizeObserver | null = null
 
   constructor(props: MapProps) {
     super(props)
@@ -205,13 +206,13 @@ export class Map extends Component<MapProps, MapReactState> {
 
     this.bindWheelEvent()
     this.syncToProps()
-
-    if (typeof (window as any).ResizeObserver !== 'undefined') {
-      this._resizeObserver = new (window as any).ResizeObserver(() => {
+    window.ResizeObserver
+    if (typeof window?.ResizeObserver !== 'undefined') {
+      this._resizeObserver = new window.ResizeObserver(() => {
         this.updateWidthHeight()
       })
 
-      this._resizeObserver.observe(this._containerRef)
+      this._containerRef && this._resizeObserver?.observe(this._containerRef)
     }
   }
 
@@ -350,7 +351,8 @@ export class Map extends Component<MapProps, MapReactState> {
     if (
       this.props.animate &&
       (!fromProps ||
-        this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens)
+        (this.props.animateMaxScreens &&
+          this.distanceInScreens(center, zoom, this.state.center, this.state.zoom) <= this.props.animateMaxScreens))
     ) {
       if (this._isAnimating) {
         cancelAnimationFrame(this._animFrame)
@@ -389,11 +391,11 @@ export class Map extends Component<MapProps, MapReactState> {
     }
   }
 
-  setCenterZoomForChildren = (center: Point | null, zoom: number): void => {
+  setCenterZoomForChildren = (center: Point | null | undefined, zoom: number): void => {
     this.setCenterZoomTarget(center || this.state.center, zoom || this.state.zoom, true)
   }
 
-  distanceInScreens = (centerTarget: Point, zoomTarget: number, center: Point, zoom: number): number => {
+  distanceInScreens = (centerTarget: Point | null, zoomTarget: number, center: Point, zoom: number): number => {
     const { width, height } = this.state
 
     // distance in pixels at the current zoom level
@@ -618,7 +620,7 @@ export class Map extends Component<MapProps, MapReactState> {
             const latLngNow = this.pixelToLatLng(this._touchStartPixel[0])
             this.setCenterZoomTarget(
               null,
-              Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)),
+              Math.max(this.props.minZoom || 0, Math.min(this.state.zoom + 1, this.props.maxZoom || 0)),
               false,
               latLngNow
             )
@@ -691,8 +693,8 @@ export class Map extends Component<MapProps, MapReactState> {
 
       const zoomDelta =
         Math.max(
-          this.props.minZoom,
-          Math.min(this.props.maxZoom, zoom + Math.log2(distance / this._touchStartDistance))
+          this.props.minZoom || 0,
+          Math.min(this.props.maxZoom || 0, zoom + Math.log2(distance / this._touchStartDistance))
         ) - zoom
       const scale = Math.pow(2, zoomDelta)
 
@@ -762,7 +764,7 @@ export class Map extends Component<MapProps, MapReactState> {
           } else {
             zoomTarget = zoomDelta > 0 ? Math.ceil(this.state.zoom) : Math.floor(this.state.zoom)
           }
-          const zoom = Math.max(minZoom, Math.min(zoomTarget, maxZoom))
+          const zoom = Math.max(minZoom || 0, Math.min(zoomTarget, maxZoom || 0))
 
           this.setCenterZoomTarget(latLng, zoom, false, latLng)
         }
@@ -789,7 +791,7 @@ export class Map extends Component<MapProps, MapReactState> {
           const latLngNow = this.pixelToLatLng(this._mousePosition || pixel)
           this.setCenterZoomTarget(
             null,
-            Math.max(this.props.minZoom, Math.min(this.state.zoom + 1, this.props.maxZoom)),
+            Math.max(this.props.minZoom || 0, Math.min(this.state.zoom + 1, this.props.maxZoom || 0)),
             false,
             latLngNow
           )
@@ -1017,7 +1019,7 @@ export class Map extends Component<MapProps, MapReactState> {
     if (zoomSnap) {
       zoomTarget = zoomDiff < 0 ? Math.floor(zoomTarget) : Math.ceil(zoomTarget)
     }
-    zoomTarget = Math.max(minZoom, Math.min(zoomTarget, maxZoom))
+    zoomTarget = Math.max(minZoom || 0, Math.min(zoomTarget, maxZoom || 0))
 
     this.setCenterZoomTarget(null, zoomTarget, false, latLngNow)
   }
@@ -1045,14 +1047,14 @@ export class Map extends Component<MapProps, MapReactState> {
     ] as Point
   }
 
-  latLngToPixel = (latLng: Point, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
+  latLngToPixel = (latLng: Point | null, center = this.state.center, zoom = this.zoomPlusDelta()): Point => {
     const { width, height, pixelDelta } = this.state
 
     const tileCenterX = lng2tile(center[1], zoom)
     const tileCenterY = lat2tile(center[0], zoom)
 
-    const tileX = lng2tile(latLng[1], zoom)
-    const tileY = lat2tile(latLng[0], zoom)
+    const tileX = lng2tile(latLng?.[1] || 0, zoom)
+    const tileY = lat2tile(latLng?.[0] || 0, zoom)
 
     return [
       (tileX - tileCenterX) * 256.0 + width / 2 + (pixelDelta ? pixelDelta[0] : 0),
@@ -1236,9 +1238,9 @@ export class Map extends Component<MapProps, MapReactState> {
     return (
       <div style={boxStyle} className={boxClassname}>
         <div className="pigeon-tiles" style={tilesStyle}>
-          {tiles.map((tile) => (
-            <Tile key={tile.key} tile={tile} tileLoaded={() => this.tileLoaded(tile.key)} />
-          ))}
+          {tiles.map((tile) =>
+            Tile ? <Tile key={tile.key} tile={tile} tileLoaded={() => this.tileLoaded(tile.key)} /> : <></>
+          )}
         </div>
       </div>
     )
@@ -1268,7 +1270,7 @@ export class Map extends Component<MapProps, MapReactState> {
 
       const c = this.latLngToPixel(anchor || position || center)
 
-      return React.cloneElement(child, {
+      return React.cloneElement(child as React.ReactElement<PigeonProps>, {
         left: c[0] - (offset ? offset[0] : 0),
         top: c[1] - (offset ? offset[1] : 0),
         latLngToPixel: this.latLngToPixel,
@@ -1382,7 +1384,7 @@ export class Map extends Component<MapProps, MapReactState> {
 
       return (
         <div className="pigeon-overlay-warning" style={style}>
-          {warningText.replace('META', meta)}
+          {warningText?.replace('META', meta)}
         </div>
       )
     } else {
