@@ -15,7 +15,7 @@ export declare class Map extends Component<MapProps, MapReactState> {
         minZoom: number;
         maxZoom: number;
         limitBounds: string;
-        dprs: any[];
+        dprs: never[];
         tileComponent: TileComponent;
     };
     _containerRef?: HTMLDivElement;
@@ -47,7 +47,7 @@ export declare class Map extends Component<MapProps, MapReactState> {
     _lastZoom: number;
     _lastCenter: Point;
     _centerStart?: Point;
-    _resizeObserver: any;
+    _resizeObserver: ResizeObserver | null;
     constructor(props: MapProps);
     componentDidMount(): void;
     componentWillUnmount(): void;
@@ -64,8 +64,8 @@ export declare class Map extends Component<MapProps, MapReactState> {
     unbindWheelEvent: () => void;
     componentDidUpdate(prevProps: MapProps): void;
     setCenterZoomTarget: (center: Point | null, zoom: number, fromProps?: boolean, zoomAround?: Point | null, animationDuration?: number) => void;
-    setCenterZoomForChildren: (center: Point | null, zoom: number) => void;
-    distanceInScreens: (centerTarget: Point, zoomTarget: number, center: Point, zoom: number) => number;
+    setCenterZoomForChildren: (center: Point | null | undefined, zoom: number) => void;
+    distanceInScreens: (centerTarget: Point | null, zoomTarget: number, center: Point, zoom: number) => number;
     animationStep: (timestamp: number) => {
         centerStep: Point;
         zoomStep: number;
@@ -100,7 +100,7 @@ export declare class Map extends Component<MapProps, MapReactState> {
     zoomAroundMouse: (zoomDiff: number, event: MouseEvent) => void;
     zoomPlusDelta: () => number;
     pixelToLatLng: (pixel: Point, center?: Point, zoom?: number) => Point;
-    latLngToPixel: (latLng: Point, center?: Point, zoom?: number) => Point;
+    latLngToPixel: (latLng: Point | null, center?: Point, zoom?: number) => Point;
     calculateZoomCenter: (center: Point, coords: Point, oldZoom: number, newZoom: number) => Point;
     setRef: (dom: HTMLDivElement) => void;
     tileValues({ center, zoom, pixelDelta, zoomDelta, width, height, }: {

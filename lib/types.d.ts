@@ -1,5 +1,5 @@
 import React from 'react';
-export declare type Point = [number, number];
+export type Point = [number, number];
 export interface Bounds {
     ne: [number, number];
     sw: [number, number];
@@ -35,7 +35,7 @@ export interface MapProps {
         latLng: [number, number];
         pixel: [number, number];
     }) => void;
-    onBoundsChanged?: ({ center, zoom, bounds, initial, width, height }: {
+    onBoundsChanged?: ({ center, zoom, bounds, initial, width, height, }: {
         center: [number, number];
         bounds: Bounds;
         zoom: number;
@@ -49,7 +49,7 @@ export interface MapProps {
     boxClassname?: string;
     tileComponent?: TileComponent;
 }
-export declare type TileComponent = (props: TileComponentProps) => JSX.Element;
+export type TileComponent = (props: TileComponentProps) => JSX.Element;
 export interface TileComponentProps {
     tile: Tile;
     tileLoaded: () => void;
@@ -77,18 +77,18 @@ export interface TileValues {
     scaleHeight: number;
     scale: number;
 }
-export declare type WarningType = 'fingers' | 'wheel';
-export declare type WAdd = typeof window.addEventListener;
-export declare type WRem = typeof window.removeEventListener;
+export type WarningType = 'fingers' | 'wheel';
+export type WAdd = typeof window.addEventListener;
+export type WRem = typeof window.removeEventListener;
 export interface MoveEvent {
     timestamp: number;
     coords: Point;
 }
-declare type MinLat = number;
-declare type MaxLat = number;
-declare type MinLng = number;
-declare type MaxLng = number;
-export declare type MinMaxBounds = [MinLat, MaxLat, MinLng, MaxLng];
+type MinLat = number;
+type MaxLat = number;
+type MinLng = number;
+type MaxLng = number;
+export type MinMaxBounds = [MinLat, MaxLat, MinLng, MaxLng];
 export interface MapReactState {
     zoom: number;
     center: Point;
@@ -116,6 +116,6 @@ export interface PigeonProps {
     mapProps?: MapProps;
     latLngToPixel?: (latLng: Point, center?: Point, zoom?: number) => Point;
     pixelToLatLng?: (pixel: Point, center?: Point, zoom?: number) => Point;
-    setCenterZoom?: (center: Point | null, zoom: number, zoomAround?: Point | null, animationDuration?: number) => void;
+    setCenterZoom?: (center: Point | null | undefined, zoom: number, zoomAround?: Point | null, animationDuration?: number) => void;
 }
 export {};

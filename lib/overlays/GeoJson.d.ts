@@ -9,25 +9,25 @@ interface GeoJsonProps extends PigeonProps {
     feature?: any;
     style?: CSSProperties;
     children?: React.ReactNode;
-    onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onClick?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onContextMenu?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onContextMenu?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onMouseOver?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onMouseOver?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onMouseOut?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
 }
 interface GeoJsonLoaderProps extends GeoJsonProps {
@@ -50,8 +50,8 @@ export declare function LineString(props: GeometryProps): JSX.Element;
 export declare function MultiLineString(props: GeometryProps): JSX.Element;
 export declare function Polygon(props: GeometryProps): JSX.Element;
 export declare function MultiPolygon(props: GeometryProps): JSX.Element;
-export declare function GeometryCollection(props: GeometryProps): JSX.Element;
+export declare function GeometryCollection(props: GeometryProps): JSX.Element | null;
 export declare function GeoJsonFeature(props: GeoJsonProps): JSX.Element;
 export declare function GeoJson(props: GeoJsonProps): JSX.Element;
-export declare function GeoJsonLoader(props: GeoJsonLoaderProps): JSX.Element;
+export declare function GeoJsonLoader(props: GeoJsonLoaderProps): JSX.Element | null;
 export {};

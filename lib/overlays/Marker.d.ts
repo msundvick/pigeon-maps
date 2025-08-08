@@ -1,33 +1,33 @@
 import React from 'react';
-import { PigeonProps } from '../types';
+import { PigeonProps, Point } from '../types';
 interface MarkerProps extends PigeonProps {
     color?: string;
-    payload?: any;
+    payload?: unknown;
     width?: number;
     height?: number;
     hover?: boolean;
     style?: React.CSSProperties;
     className?: string;
     children?: JSX.Element;
-    onClick?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onClick?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onContextMenu?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onContextMenu?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onMouseOver?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onMouseOver?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
-    onMouseOut?: ({ event: HTMLMouseEvent, anchor: Point, payload: any }: {
-        event: any;
-        anchor: any;
-        payload: any;
+    onMouseOut?: (props: {
+        event: React.MouseEvent<Element, MouseEvent>;
+        anchor?: Point;
+        payload: unknown;
     }) => void;
 }
 export declare function Marker(props: MarkerProps): JSX.Element;
