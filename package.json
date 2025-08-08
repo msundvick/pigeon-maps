@@ -15,6 +15,9 @@
     "url": "https://github.com/mariusandra/pigeon-maps/issues"
   },
   "homepage": "https://github.com/mariusandra/pigeon-maps#readme",
+  "engines": {
+    "node": ">=18.0.0 <19.0.0"
+  },
   "scripts": {
     "start": "webpack-dev-server --history-api-fallback --hot --host 0.0.0.0 --port 4040",
     "build": "rimraf lib && rollup -c && rimraf lib/demo && node build.mjs && rimraf lib/src",
